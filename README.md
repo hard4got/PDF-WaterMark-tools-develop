@@ -19,7 +19,7 @@ PdfToImage.java pdf转png(2022/12/30 新增功能)
 
 pom.xml 依赖包的导入
 
-（以下说明为旧版本，新版本还想增加一些功能在封装😏）
+（以下说明为旧版本，新版本还想增加一些功能再封装😏）
 
 WaterPdf_v1.0.jar为IDEA导出的jar包
 
