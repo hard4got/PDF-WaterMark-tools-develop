@@ -8,15 +8,9 @@ import java.awt.*;
 public  class ProgressBar03 extends JFrame{
    static JProgressBar progressBar;
     static JFrame jf;
-    //判断是否选择添加图片水印，默认是添加文字水印
-    private static boolean isPict = false;
     //进度条计数
     private static int e;
     //判断是否选择添加图片水印
-    public static void setIsPict(boolean s){
-        isPict = s;
-        System.out.println("是否是图片水印："+isPict);
-    }
 
     public void ProgressBar03(){
         jf = new JFrame("进度提示");
@@ -42,17 +36,21 @@ public  class ProgressBar03 extends JFrame{
     }
 
     static class MyThread extends Thread{//自定义线程，实现进度的不断变化
-        @Override
-
-        public void run() {
-            //判断是否是添加图片类型，得到的计数不同
-            if (isPict) {
-                //获取添加水印时的进度计数
-                e = PdfWaterPict.getProgressBarValue();
-            }
-            else {
+        public void pdfFlag(int flag){
+            if (1 == flag){
                 e = PdfWater.getProgressBarValue();
             }
+            if (2 == flag){
+                e = PdfWaterPict.getProgressBarValue();
+            }
+            if (3 == flag){
+                e = PdfToImage.getProgressBarValue();
+            }
+        }
+        @Override
+        public void run() {
+            //判断是否是添加图片类型，得到的计数不同
+
             System.out.println("这是从PdfWater中获取到e的值:"+e);
             /*
             *  如果只使用 progressBar.setValue(e); 方法，进度条没有执行过程，该操作会被阻塞

@@ -124,8 +124,6 @@ public class PdfWaterPict {
         waterMarkBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //现在添加的是图片水印
-                ProgressBar03.setIsPict(true);
                 //执行加水印方法
                 waterMark(inputFile,outputFile,iconFile,textField02,textField03,textField05,textField06);
                 System.out.println("水印是否添加成功:"+isMarked);
@@ -162,8 +160,7 @@ public class PdfWaterPict {
                     msgTextArea02.setText("");
 
                 }
-                //执行完成后将判断是否添加的是图片水印初始化为否
-                ProgressBar03.setIsPict(false);
+
             }
         });
 
@@ -301,6 +298,7 @@ public class PdfWaterPict {
                e = (int) d;
                System.out.println("这是e:"+e);
                //执行线程，更新进度条计数
+               myThread.pdfFlag(2);
                myThread.run();
 
                System.out.println("正在添加第"+(i+1)+"页.....");

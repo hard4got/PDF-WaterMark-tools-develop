@@ -1,50 +1,49 @@
-/*
- * Create By heTao on 2021/11/03
- * Licensed under the MIT license
- *  */
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.pdf.*;
-import com.sun.javaws.progress.Progress;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 
 
-public class PdfWater {
+public class PdfToImage {
+    /**
+     *使用pdfbox转换全部的pdf
+     *自由确定起始页和终止页
+     * @param fileAddress 文件地址
+     * @param fileName pdf文件名
+     * @param indexOfStart 开始页  开始转换的页码，从0开始
+     * @param indexOfEnd 结束页  停止转换的页码，-1为全部
+     * @param type 图片类型
+     */
+    //PDF文件地址
+    private static String fileAddress;
     //PDF文件名
     private static String fileName;
-    //文件输入路径
-    private static String inputFile;
-    //文件输出路径
-    private static String outputFile;
-    //水印名称
-    private static String waterMarkName;
-    //是否添加水印
-    private static Boolean isMarked = false;
-    //水印位置X
-    private static int waterMarkPosi_X;
-    //水印位置Y
-    private static int waterMarkPosi_Y;
-    //水印旋转角度
-    private static int waterMarkRota;
-    //水印文字大小
-    private static int waterMarkSize;
+    //图片类型
+    private static String type;
     //进度条计数
     private static int e;
+    //起始页码
+    private static int indexOfStart;
+    //结束页码
+    private static double indexOfEnd;
+    //是否产生图片
+    private static Boolean isImage = false;
 
-    public static void main(String[] args) {
-
-        PdfWater pdfWater = new PdfWater();
-        pdfWater.initUI();
-
+    public static void main(String[] args) throws Exception {
+//        String fileAddress = "/Users/wangjihua/Desktop/pdfbox";
+//        String fileName = "liuxuexuzhi";
+//        String type = "png";
+//        pdf2png(fileAddress, fileName, type);
+        PdfToImage pdfToImage = new PdfToImage();
+        pdfToImage.initUI();
     }
 
     public static void  initUI(){
@@ -52,7 +51,7 @@ public class PdfWater {
         final JFrame frame = new JFrame();
         // 4.设置窗体容器组件的属性值：标题、大小、显示位置、关闭操作、禁止调整组件大小、布局、可见。
         // 设置窗体的标题属性值
-        frame.setTitle("PDF加文字水印");
+        frame.setTitle("PDF转图片");
         // 设置窗体的大小属性值，单位是像素
         frame.setSize(380,320);
         // 设置窗体显示在屏幕的中央
@@ -73,63 +72,52 @@ public class PdfWater {
         msgTextArea.setEditable(false);
 
         final JButton openBtn = new JButton("打开");
-        final JButton waterMarkBtn = new JButton("加水印");
+        final JButton waterMarkBtn = new JButton("转图片");
         final JButton backBtn = new JButton("返回");
         waterMarkBtn.setEnabled(false);
-        //水印文字提示
-        JLabel label01 = new JLabel();
-        label01.setText("请输入水印文字:");
-        label01.setFont(new Font(null, Font.PLAIN, 15));  // 设置字体，null 表示使用默认字体
 
-        final JTextField textField = new JTextField(10);
-        textField.setFont(new Font(null, Font.PLAIN, 15));
-        textField.setText("机 密");
         //水印位置提示
         JLabel label02 = new JLabel();
-        label02.setText("请指定水印位置:");
+        label02.setText("请指定转换页数:");
         label02.setFont(new Font(null, Font.PLAIN, 15));  // 设置字体，null 表示使用默认字体
 
         final JTextField textField02 = new JTextField(5);
         textField02.setFont(new Font(null, Font.PLAIN, 15));
-        textField02.setText("350");
+        textField02.setText("");
 
         final JTextField textField03 = new JTextField(5);
         textField03.setFont(new Font(null, Font.PLAIN, 15));
-        textField03.setText("350");
-        //水印旋转角度提示
-        JLabel label03 = new JLabel();
-        label03.setText("请指定水印旋转角度:");
-        label03.setFont(new Font(null, Font.PLAIN, 15));  // 设置字体，null 表示使用默认字体
-
-        final JTextField textField04 = new JTextField(10);
-        textField04.setFont(new Font(null, Font.PLAIN, 15));
-        textField04.setText("55");
-        //水印大小提示
-        JLabel label04 = new JLabel();
-        label04.setText("请指定水印文字大小:");
-        label04.setFont(new Font(null, Font.PLAIN, 15));
-
-        final JTextField textField05 = new JTextField(5);
-        textField05.setFont(new Font(null, Font.PLAIN, 15));
-        textField05.setText("150");
+        textField03.setText("");
 
         openBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showFileOpenDialog(frame, msgTextArea,openBtn,waterMarkBtn);
+                try {
+                    showFileOpenDialog(frame, msgTextArea,openBtn,waterMarkBtn);
+                    textField02.setText(String.valueOf(indexOfStart));
+
+                    textField03.setText(String.valueOf((int)indexOfEnd));
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         });
 
         waterMarkBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //转换之前获取指定的起始页和结束页
+                String indexOfStart1 = textField02.getText();
+                String indexOfEnd1 = textField03.getText();
+                int indexOfStart = Integer.parseInt(indexOfStart1);
+                double indexOfEnd = Double.parseDouble(indexOfEnd1);
                 //执行添加水印方法
-                waterMark(PdfWater.inputFile,PdfWater.outputFile,waterMarkName,textField,textField02,textField03,textField04,textField05);
-                System.out.println("水印是否添加成功:"+isMarked);
-                if (isMarked){
+                pdf2png(PdfToImage.fileAddress, PdfToImage.fileName, PdfToImage.type, indexOfStart, indexOfEnd);
+                System.out.println("pdf是否转为图片:"+isImage);
+                if (isImage){
                     JOptionPane.showMessageDialog(
                             frame,
-                            "水印添加成功！",
+                            "pdf转图片成功！",
                             "消息标题",
                             JOptionPane.INFORMATION_MESSAGE
                     );
@@ -139,12 +127,14 @@ public class PdfWater {
                     openBtn.setEnabled(true);
                     waterMarkBtn.setEnabled(false);
                     msgTextArea.setText("");
-                    isMarked = false;
+                    textField02.setText("");
+                    textField03.setText("");
+                    isImage = false;
 
                 }else {
                     JOptionPane.showMessageDialog(
                             frame,
-                            "水印添加失败！",
+                            "pdf转图片失败！",
                             "消息标题",
                             JOptionPane.INFORMATION_MESSAGE
                     );
@@ -153,6 +143,8 @@ public class PdfWater {
                     openBtn.setEnabled(true);
                     waterMarkBtn.setEnabled(false);
                     msgTextArea.setText("");
+                    textField02.setText("");
+                    textField03.setText("");
                 }
 
             }
@@ -172,15 +164,9 @@ public class PdfWater {
 
         panel.add(msgTextArea);
         panel.add(openBtn);
-        panel.add(label01);
-        panel.add(textField);
         panel.add(label02);
         panel.add(textField02);
         panel.add(textField03);
-        panel.add(label03);
-        panel.add(textField04);
-        panel.add(label04);
-        panel.add(textField05);
         panel.add(waterMarkBtn);
         panel.add(backBtn);
 
@@ -189,8 +175,7 @@ public class PdfWater {
         frame.setVisible(true);
 
     }
-
-    public static void showFileOpenDialog(Component parent, JTextArea msgTextArea,JButton openBtn,JButton waterMarkBtn) {
+    public static void showFileOpenDialog(Component parent, JTextArea msgTextArea,JButton openBtn,JButton waterMarkBtn) throws IOException {
         // 创建一个默认的文件选取器
         JFileChooser fileChooser = new JFileChooser();
         // 设置默认显示的文件夹为当前文件夹
@@ -206,93 +191,89 @@ public class PdfWater {
         // 打开文件选择框（线程将被阻塞, 直到选择框被关闭）
         int result = fileChooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-         openBtn.setEnabled(false);
-         waterMarkBtn.setEnabled(true);
+            openBtn.setEnabled(false);
+            waterMarkBtn.setEnabled(true);
             // 如果点击了"确定", 则获取选择的文件路径
             File file = fileChooser.getSelectedFile();
+
+            PDDocument doc = PDDocument.load(file);
+
             // 如果允许选择多个文件, 则通过下面方法获取选择的所有文件
             // File[] files = fileChooser.getSelectedFiles();
+            //设置转换的起始页和结束页（默认全部页数）
+            PdfToImage.indexOfStart = 1;
+            PdfToImage.indexOfEnd = doc.getNumberOfPages();
+
+
             msgTextArea.append("打开文件: " + file.getAbsolutePath());
-            PdfWater.inputFile = file.getAbsolutePath();
-            System.out.println("输入文件路径："+PdfWater.inputFile);
+            PdfToImage.fileAddress = file.getAbsolutePath();
+            System.out.println("输入文件路径："+PdfToImage.fileAddress);
             fileName = file.getName();
-            System.out.println("文件名："+PdfWater.fileName);
-            outputFile = file.getParent()+"/加水印"+fileName;
-            System.out.println("输出文件路径："+outputFile);
+            System.out.println("文件名："+PdfToImage.fileName);
+            type = "png";
+
         }
     }
-
+    //返回进度条计数
     public static int getProgressBarValue(){
         return e;
     }
 
-
-    public static void waterMark(String inputFile,String outputFile, String waterMarkName,JTextField textField,JTextField textField02,JTextField textField03,JTextField textField04,JTextField textField05) {
+    public static void pdf2png(String fileAddress, String fileName, String type, int indexOfStart, double indexOfEnd) {
+        // 将pdf装图片 并且自定义图片得格式大小
+        File file = new File(fileAddress);
         try {
-            PdfReader reader = new PdfReader(inputFile);
-            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputFile));
-            BaseFont base = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.EMBEDDED);
-            PdfGState gs = new PdfGState();
-            //改透明度
-            gs.setFillOpacity(0.5f);
-            gs.setStrokeOpacity(0.4f);
-            double total = reader.getNumberOfPages();
-            JLabel label = new JLabel();
-            label.setText(waterMarkName);
-            PdfContentByte under;
-
-            waterMarkName = textField.getText();
-            System.out.println("获取水印名称："+waterMarkName);
-            waterMarkPosi_X = Integer.parseInt(textField02.getText());
-            System.out.println("获取水印位置X："+waterMarkPosi_X);
-            waterMarkPosi_Y = Integer.parseInt(textField03.getText());
-            System.out.println("获取水印位置Y："+waterMarkPosi_Y);
-            waterMarkRota = Integer.parseInt(textField04.getText());
-            System.out.println("获取水印旋转角度："+waterMarkRota);
-            waterMarkSize = Integer.parseInt(textField05.getText());
-            System.out.println("获取水印文字大小："+waterMarkSize);
-            // 添加一个水印
+            PDDocument doc = PDDocument.load(file);
+            PDFRenderer renderer = new PDFRenderer(doc);
+//            double total = doc.getNumberOfPages();
+            //获取pdf文件的目录
+            String outputFile = file.getParent();
+            //获取pdf文件的文件名（去掉后缀）
+            String caselsh = fileName.substring(0, fileName.lastIndexOf("."));
             //调用进度条方法
             ProgressBar03.Progress03();
             //调用进度条线程
             ProgressBar03.MyThread myThread = new ProgressBar03.MyThread();
-
-            for (int i = 1; i <= total; i++) {
-                System.out.println("这是total"+total);
+            for (int i = indexOfStart - 1; i < indexOfEnd; i++) {
+                System.out.println("这是total"+indexOfEnd);
                 //设置进度条计数
-                double d = i/(total)*100;
+                double d = i/(indexOfEnd)*100;
                 System.out.println("这是d："+d);
-                 e = (int) d;
+                e = (int) d;
                 System.out.println("这是e:"+e);
                 //执行线程，更新进度条计数
-                myThread.pdfFlag(1);
+                myThread.pdfFlag(3);
                 myThread.run();
-
-                // 在内容上方加水印
-                under = stamper.getOverContent(i);
-                //在内容下方加水印
-                //under = stamper.getUnderContent(i);
-                gs.setFillOpacity(0.5f);
-                under.setGState(gs);
-                under.beginText();
-                //改变颜色
-                under.setColorFill(BaseColor.LIGHT_GRAY);
-                //改水印文字大小
-                under.setFontAndSize(base, waterMarkSize);
-                under.setTextMatrix(70, 200);
-                //后3个参数，x坐标，y坐标，角度
-
-                System.out.println("正在添加第"+i+"页.....");
-
-                under.showTextAligned(Element.ALIGN_CENTER, waterMarkName, waterMarkPosi_X, waterMarkPosi_Y, waterMarkRota);
-
-                under.endText();
+//                myThread.pdfTyoe(e);
+                BufferedImage image = renderer.renderImageWithDPI(i, 144); // Windows native DPI
+                // BufferedImage srcImage = resize(image, 240, 240);//产生缩略图
+                ImageIO.write(image, type, new File(outputFile + "/" + caselsh + "_" + (i + 1) + "." + type));
             }
-            stamper.close();
-            reader.close();
-            PdfWater.isMarked = true;
-        } catch (Exception e) {
+            PdfToImage.isImage = true;
+            System.out.println("处理完毕!!!!");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+  
+
+
+
+//    public static void pdf2png(String fileAddress,String fileName,int indexOfStart,int indexOfEnd,String type) {
+//            // 将pdf装图片 并且自定义图片得格式大小
+//            File file = new File(fileAddress+"\\"+fileName+".pdf");
+//            try {
+//            PDDocument doc = PDDocument.load(file);
+//            PDFRenderer renderer = new PDFRenderer(doc);
+//            int pageCount = doc.getNumberOfPages();
+//            for (int i = indexOfStart; i < indexOfEnd; i++) {
+//            BufferedImage image = renderer.renderImageWithDPI(i, 144); // Windows native DPI
+//            // BufferedImage srcImage = resize(image, 240, 240);//产生缩略图
+//            ImageIO.write(image, type, new File(fileAddress+"\\"+fileName+"_"+(i+1)+"."+type));
+//            }
+//            } catch (IOException e) {
+//            e.printStackTrace();
+//            }
+//            }
 }
