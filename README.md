@@ -4,10 +4,11 @@
 
 开发环境  IDEA+JDK1.8
 
-借助了itextpdf和pdfbox插件（只是进行简单的封装😁）
+借助了itextpdf和pdfbox插件（只是进行简单的封装....）
 
 
 Menu.java 程序入口
+截屏2023-01-06 14.46.36![图片](https://user-images.githubusercontent.com/48041910/211006483-d4a68953-adf3-4676-bc13-ec104e67c101.png)
 
 PdfWater.java  添加文字水印
 
@@ -17,9 +18,11 @@ ProgerssBar03.java   进度条
 
 PdfToImage.java pdf转png(2022/12/30 新增功能)
 
+ImageToPdf.java png转pdf(2023/01/06 新增功能)
+
 pom.xml 依赖包的导入
 
-（以下说明为旧版本，新版本还想增加一些功能再封装😏）
+（以下说明为旧版本，新版本还想增加一些功能再封装....）
 
 WaterPdf_v1.0.jar为IDEA导出的jar包
 
