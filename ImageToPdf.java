@@ -264,10 +264,13 @@ public class ImageToPdf {
                     stringBuffer.append(0);
                 }
             }
-            for (int i = 0; i < sameFileName.length; i++) {
-                if (!(sameFileName[0].equals(sameFileName[i])))
+            for (String s:sameFileName
+                 ) {
+                if (s == null || s.equals("")){
                     stringBuffer.append(0);
+                }
             }
+
             ImageToPdf image = new ImageToPdf();
             if (stringBuffer.toString().contains("0")){
                 System.out.println("文件格式不正确，使用通用接口");
