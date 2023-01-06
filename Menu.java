@@ -23,6 +23,7 @@ public class Menu {
         final JButton btn = new JButton("添加文字水印");
         final JButton btn02 = new JButton("添加图片水印");
         final JButton btn05 = new JButton("pdf转图片");
+        final JButton btn06 = new JButton("图片转pdf");
 //        final JButton btn04 = new JButton("松山湖专用");
         final JButton btn03 = new JButton("退出");
         // 添加按钮的点击事件监听器
@@ -67,6 +68,16 @@ public class Menu {
                 PdfToImage.initUI();
             }
         });
+        btn06.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 获取到的事件源就是按钮本身
+                // JButton btn = (JButton) e.getSource();
+                System.out.println("图片转pdf");
+                jf.dispose();
+                ImageToPdf.initUI();
+            }
+        });
         btn03.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,6 +91,7 @@ public class Menu {
         panel.add(btn02);
 //        panel.add(btn04);
         panel.add(btn05);
+        panel.add(btn06);
         panel.add(btn03);
 
         jf.setContentPane(panel);

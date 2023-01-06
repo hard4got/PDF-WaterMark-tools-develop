@@ -5,6 +5,10 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author hetao
+ * @Date 2023/1/6 下午2:35
+ */
 public  class ProgressBar03 extends JFrame{
    static JProgressBar progressBar;
     static JFrame jf;

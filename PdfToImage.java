@@ -10,7 +10,10 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
+/**
+ * @author hetao
+ * @Date 2023/1/6 下午2:35
+ */
 
 public class PdfToImage {
     /**
@@ -38,10 +41,6 @@ public class PdfToImage {
     private static Boolean isImage = false;
 
     public static void main(String[] args) throws Exception {
-//        String fileAddress = "/Users/wangjihua/Desktop/pdfbox";
-//        String fileName = "liuxuexuzhi";
-//        String type = "png";
-//        pdf2png(fileAddress, fileName, type);
         PdfToImage pdfToImage = new PdfToImage();
         pdfToImage.initUI();
     }
@@ -76,7 +75,7 @@ public class PdfToImage {
         final JButton backBtn = new JButton("返回");
         waterMarkBtn.setEnabled(false);
 
-        //水印位置提示
+        //设置转换页数
         JLabel label02 = new JLabel();
         label02.setText("请指定转换页数:");
         label02.setFont(new Font(null, Font.PLAIN, 15));  // 设置字体，null 表示使用默认字体
@@ -111,7 +110,7 @@ public class PdfToImage {
                 String indexOfEnd1 = textField03.getText();
                 int indexOfStart = Integer.parseInt(indexOfStart1);
                 double indexOfEnd = Double.parseDouble(indexOfEnd1);
-                //执行添加水印方法
+                //执行pdf转图片方法
                 pdf2png(PdfToImage.fileAddress, PdfToImage.fileName, PdfToImage.type, indexOfStart, indexOfEnd);
                 System.out.println("pdf是否转为图片:"+isImage);
                 if (isImage){
@@ -183,7 +182,7 @@ public class PdfToImage {
         // 设置文件选择的模式（只选文件、只选文件夹、文件和文件均可选）
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         // 设置是否允许多选
-        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setMultiSelectionEnabled(false);
         // 添加可用的文件过滤器（FileNameExtensionFilter 的第一个参数是描述, 后面是需要过滤的文件扩展名 可变参数）
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("zip(*.zip, *.rar)", "zip", "rar"));
         // 设置默认使用的文件过滤器
@@ -195,16 +194,12 @@ public class PdfToImage {
             waterMarkBtn.setEnabled(true);
             // 如果点击了"确定", 则获取选择的文件路径
             File file = fileChooser.getSelectedFile();
-
-            PDDocument doc = PDDocument.load(file);
-
             // 如果允许选择多个文件, 则通过下面方法获取选择的所有文件
-            // File[] files = fileChooser.getSelectedFiles();
+//            File[] files = fileChooser.getSelectedFiles();
+            PDDocument doc = PDDocument.load(file);
             //设置转换的起始页和结束页（默认全部页数）
             PdfToImage.indexOfStart = 1;
             PdfToImage.indexOfEnd = doc.getNumberOfPages();
-
-
             msgTextArea.append("打开文件: " + file.getAbsolutePath());
             PdfToImage.fileAddress = file.getAbsolutePath();
             System.out.println("输入文件路径："+PdfToImage.fileAddress);
@@ -256,24 +251,5 @@ public class PdfToImage {
         }
     }
 
-  
-
-
-
-//    public static void pdf2png(String fileAddress,String fileName,int indexOfStart,int indexOfEnd,String type) {
-//            // 将pdf装图片 并且自定义图片得格式大小
-//            File file = new File(fileAddress+"\\"+fileName+".pdf");
-//            try {
-//            PDDocument doc = PDDocument.load(file);
-//            PDFRenderer renderer = new PDFRenderer(doc);
-//            int pageCount = doc.getNumberOfPages();
-//            for (int i = indexOfStart; i < indexOfEnd; i++) {
-//            BufferedImage image = renderer.renderImageWithDPI(i, 144); // Windows native DPI
-//            // BufferedImage srcImage = resize(image, 240, 240);//产生缩略图
-//            ImageIO.write(image, type, new File(fileAddress+"\\"+fileName+"_"+(i+1)+"."+type));
-//            }
-//            } catch (IOException e) {
-//            e.printStackTrace();
-//            }
-//            }
 }
+//  /Users/username/Desktop/pdfbox/preview.pdf

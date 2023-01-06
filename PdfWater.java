@@ -2,14 +2,12 @@
  * Create By heTao on 2021/11/03
  * Licensed under the MIT license
  *  */
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.pdf.*;
-import com.sun.javaws.progress.Progress;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +15,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 
+/**
+ * @author hetao
+ * @Date 2023/1/6 下午2:35
+ */
 
 public class PdfWater {
     //PDF文件名
@@ -198,7 +200,7 @@ public class PdfWater {
         // 设置文件选择的模式（只选文件、只选文件夹、文件和文件均可选）
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         // 设置是否允许多选
-        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setMultiSelectionEnabled(false);
         // 添加可用的文件过滤器（FileNameExtensionFilter 的第一个参数是描述, 后面是需要过滤的文件扩展名 可变参数）
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("zip(*.zip, *.rar)", "zip", "rar"));
         // 设置默认使用的文件过滤器

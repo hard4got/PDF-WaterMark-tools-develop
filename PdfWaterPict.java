@@ -13,6 +13,10 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 
+/**
+ * @author hetao
+ * @Date 2023/1/6 下午2:35
+ */
 public class PdfWaterPict {
     //PDF文件名
     private static String fileName;
